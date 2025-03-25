@@ -2,6 +2,7 @@
 
 import { ExternalLink, Github, PanelsTopLeft } from "lucide-react";
 import { SecuredByCrossmint } from "./crossmint/secured-by-crossmint";
+import { siteConfig } from "@/config/site";
 
 export function Footer() {
   return (
@@ -9,7 +10,7 @@ export function Footer() {
       <div className="flex w-full items-center md:justify-center gap-4 md:gap-12 flex-col md:flex-row">
         <a
           className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
+          href={siteConfig.footer.links[0].href}
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -18,7 +19,7 @@ export function Footer() {
         </a>
         <a
           className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
+          href={siteConfig.footer.links[1].href}
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -27,7 +28,7 @@ export function Footer() {
         </a>
         <a
           className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
+          href={siteConfig.footer.links[2].href}
           target="_blank"
           rel="noopener noreferrer"
         >

@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Header } from "../components/ui/header";
 import { Footer } from "@/components/ui/footer";
+import { siteConfig } from "@/config/site";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Crossmint Quickstart Examples",
-  description: "Demos ",
+  title: siteConfig.title,
+  description: siteConfig.description,
 };
 
 export default function RootLayout({

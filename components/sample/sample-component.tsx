@@ -13,25 +13,21 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
 import { Copy } from "lucide-react";
 
-export function CreateWallet() {
+// Note: this component is a sample component that's used as a template for creating new components.
+export function SampleComponent() {
   const { logout, login } = useAuth();
   const { getOrCreateWallet, wallet } = useWallet();
 
-  console.log({ wallet });
-
   return (
-    <Card className="w-[350px]">
+    <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Image src="/sol.svg" alt="Solana" width={24} height={24} />
-          Create wallet
+          Create a wallet
         </CardTitle>
-        <CardDescription>
-          Create a new wallet to start using Solana.
-        </CardDescription>
+        <CardDescription>Create a wallet to start using Solana</CardDescription>
       </CardHeader>
       <CardContent>
         <form>

@@ -1,5 +1,6 @@
 "use client";
 
+import { siteConfig } from "@/config/site";
 import {
   CrossmintProvider,
   CrossmintAuthProvider,
@@ -19,7 +20,7 @@ export function CrossmintProviderWrapper({
       apiKey={process.env.NEXT_PUBLIC_CROSSMINT_AUTH_SMART_WALLET_API_KEY || ""}
     >
       <CrossmintAuthProvider
-        authModalTitle="Solana Smart Wallet Demo"
+        authModalTitle={siteConfig.title}
         embeddedWallets={{
           createOnLogin: "all-users",
           type: "solana-smart-wallet",
