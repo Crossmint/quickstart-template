@@ -22,9 +22,8 @@ export function CrossmintProviderWrapper({
         authModalTitle="Solana Smart Wallet Demo"
         embeddedWallets={{
           createOnLogin: "all-users",
-          type: "evm-smart-wallet",
+          type: "solana-smart-wallet",
           showPasskeyHelpers: true,
-          defaultChain: "polygon-amoy",
         }}
       >
         {children}
