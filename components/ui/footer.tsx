@@ -1,53 +1,40 @@
 "use client";
 
-import { ExternalLink, Mail, Moon, PanelsTopLeft, Sun } from "lucide-react";
-import { Button } from "./button";
-import { useTheme } from "next-themes";
+import { ExternalLink, Github, PanelsTopLeft } from "lucide-react";
 import { SecuredByCrossmint } from "./crossmint/secured-by-crossmint";
 
 export function Footer() {
-  const { setTheme, theme } = useTheme();
-
   return (
-    <footer className="row-start-3 flex-col md:flex-row gap-10 py-10 w-full mt-auto border-t flex items-center justify-center bg-accents-1 z-20">
-      <a
-        className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-        href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        <PanelsTopLeft />
-        Quickstarts
-      </a>
-      <a
-        className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-        href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        <ExternalLink />
-        Go to Crossmint.com
-      </a>
-      <a
-        className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-        href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        <Mail />
-        Contact sales
-      </a>
-
-      <div className="flex items-center gap-2">
-        <Button
-          variant="outline"
-          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+    <footer className="flex flex-col gap-6 md:gap-10 p-6 w-full mt-auto items-center justify-center z-20">
+      <div className="flex w-full items-center md:justify-center gap-4 md:gap-12 flex-col md:flex-row">
+        <a
+          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
+          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
+          target="_blank"
+          rel="noopener noreferrer"
         >
-          {theme === "dark" ? <Sun /> : <Moon />}
-          {theme === "dark" ? "Light" : "Dark"}
-        </Button>
+          <Github />
+          View code
+        </a>
+        <a
+          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
+          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <PanelsTopLeft />
+          See all quickstarts
+        </a>
+        <a
+          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
+          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <ExternalLink />
+          Go to Crossmint.com
+        </a>
       </div>
-
       <SecuredByCrossmint />
     </footer>
   );
