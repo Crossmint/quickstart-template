@@ -81,12 +81,7 @@ export function HomeContent() {
                         document.activeElement as HTMLButtonElement;
                       button.disabled = true;
                       const originalContent = button.innerHTML;
-                      button.innerHTML = `<Image
-                        src="/check.svg"
-                        alt="Check"
-                        width={18}
-                        height={18}
-                      />`;
+                      button.innerHTML = `<img src="/check.svg" alt="Check" width="16" height="16" />`;
                       setTimeout(() => {
                         button.innerHTML = originalContent;
                         button.disabled = false;
