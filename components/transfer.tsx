@@ -19,7 +19,7 @@ const isSolanaAddressValid = (address: string) => {
 
 export function TransferFunds() {
   const { wallet, type } = useWallet();
-  const [token, setToken] = useState<"sol" | "usdc" | null>(null);
+  const [token, setToken] = useState<"sol" | "usdc" | null>("sol");
   const [recipient, setRecipient] = useState<string | null>(null);
   const [amount, setAmount] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -45,33 +45,15 @@ export function TransferFunds() {
 
     try {
       setIsLoading(true);
-      const crossmintWalletAddress = wallet.getAddress();
-      // Fetch balances to check if user has enough funds
-      const balances = (await wallet.balances([token])) as any[];
-      const tokenBalance =
-        balances.find((t) => t.token === token)?.balances.total || "0";
-      const decimals = token === "sol" ? 9 : 6;
-      const availableBalance = Number(tokenBalance) / Math.pow(10, decimals);
-      if (amount > availableBalance) {
-        alert(
-          `Transfer: Insufficient ${token.toUpperCase()} balance. Available: ${availableBalance.toFixed(
-            2
-          )}`
-        );
-        return;
-      }
       function buildTransaction() {
         return token === "sol"
-          ? createSolTransferTransaction(
-              crossmintWalletAddress,
-              recipient as string,
-              amount as number
-            )
+          ? createSolTransferTransaction(wallet?.address!, recipient!, amount!)
           : createTokenTransferTransaction(
-              crossmintWalletAddress,
-              recipient as string,
-              "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU", // USDC token mint
-              amount as number
+              wallet?.address!,
+              recipient!,
+              process.env.NEXT_PUBLIC_USDC_TOKEN_MINT ||
+                "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU", // USDC token mint
+              amount!
             );
       }
 
@@ -81,10 +63,8 @@ export function TransferFunds() {
       });
       setTxnHash(`https://solscan.io/tx/${txnHash}?cluster=devnet`);
     } catch (err) {
-      console.error("Something went wrong", err);
-      const errorMessage =
-        err instanceof Error ? err.message : "Something went wrong";
-      alert("Transfer: " + errorMessage);
+      console.error("Transfer: ", err);
+      alert("Transfer: " + err);
     } finally {
       setIsLoading(false);
     }

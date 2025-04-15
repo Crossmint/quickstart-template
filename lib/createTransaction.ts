@@ -14,7 +14,10 @@ import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
 
-const connection = new Connection("https://api.devnet.solana.com", "confirmed");
+const connection = new Connection(
+  process.env.NEXT_PUBLIC_RPC_URL || "https://api.devnet.solana.com",
+  "confirmed"
+);
 
 export async function createSolTransferTransaction(
   from: string,
@@ -36,7 +39,7 @@ export async function createSolTransferTransaction(
   const message = new TransactionMessage({
     instructions,
     recentBlockhash: "11111111111111111111111111111111",
-    payerKey: new PublicKey("11111111111111111111111111111112"),
+    payerKey: fromPublicKey,
   }).compileToV0Message();
 
   return new VersionedTransaction(message);
@@ -105,7 +108,7 @@ export async function createTokenTransferTransaction(
   const message = new TransactionMessage({
     instructions,
     recentBlockhash: "11111111111111111111111111111111",
-    payerKey: new PublicKey("11111111111111111111111111111112"),
+    payerKey: fromPublicKey,
   }).compileToV0Message();
 
   return new VersionedTransaction(message);

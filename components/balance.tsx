@@ -2,21 +2,21 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { useWallet } from "@crossmint/client-sdk-react-ui";
-import { PopupWindow } from "@crossmint/client-sdk-window";
+import { useWallet, type WalletBalance } from "@crossmint/client-sdk-react-ui";
 
 export function WalletBalance() {
   const { wallet, type } = useWallet();
-  const [data, setData] = useState<any[]>([]);
+  const [balances, setBalances] = useState<WalletBalance>([]);
 
   useEffect(() => {
     async function fetchBalances() {
       if (!wallet || type !== "solana-smart-wallet") return;
       try {
-        const balances = (await wallet.balances(["sol", "usdc"])) as any[];
-        setData(balances || []);
+        const balances = await wallet.getBalances(["sol", "usdc"]);
+        setBalances(balances);
       } catch (error) {
         console.error("Error fetching wallet balances:", error);
+        alert("Error fetching wallet balances: " + error);
       }
     }
     fetchBalances();
@@ -27,34 +27,9 @@ export function WalletBalance() {
   };
 
   const solBalance =
-    data?.find((t) => t.token === "sol")?.balances.total || "0";
+    balances?.find((t) => t.token === "sol")?.balances.total || "0";
   const usdcBalance =
-    data?.find((t) => t.token === "usdc")?.balances.total || "0";
-
-  async function handleOnFund(token: "sol" | "usdc") {
-    try {
-      switch (token) {
-        case "sol":
-          await PopupWindow.init("https://faucet.solana.com", {
-            awaitToLoad: false,
-            crossOrigin: true,
-            width: 550,
-            height: 700,
-          });
-          break;
-        case "usdc":
-          await PopupWindow.init("https://faucet.circle.com", {
-            awaitToLoad: false,
-            crossOrigin: true,
-            width: 550,
-            height: 700,
-          });
-          break;
-      }
-    } catch (err) {
-      console.error("Error funding wallet " + token + " - " + err);
-    }
-  }
+    balances?.find((t) => t.token === "usdc")?.balances.total || "0";
 
   return (
     <div className="flex flex-col gap-2">
@@ -78,18 +53,26 @@ export function WalletBalance() {
         </div>
       </div>
       <div className="flex flex-col gap-2 mt-2">
-        <button
-          onClick={() => handleOnFund("sol")}
+        <a
+          href="https://faucet.solana.com"
+          target="_blank"
+          rel="noopener noreferrer"
           className="flex items-center justify-center gap-1.5 text-sm py-1.5 px-3 rounded-md bg-accent/10 text-accent hover:bg-accent/20 transition-colors"
         >
           + Get free test SOL
-        </button>
-        <button
-          onClick={() => handleOnFund("usdc")}
+        </a>
+        <a
+          href="https://faucet.circle.com"
+          target="_blank"
+          rel="noopener noreferrer"
           className="flex items-center justify-center gap-1.5 text-sm py-1.5 px-3 rounded-md bg-accent/10 text-accent hover:bg-accent/20 transition-colors"
         >
           + Get free test USDC
-        </button>
+        </a>
+      </div>
+      <div className="text-gray-500 text-xs">
+        Refresh the page after topping up. Balance may take a few seconds to
+        update.
       </div>
     </div>
   );

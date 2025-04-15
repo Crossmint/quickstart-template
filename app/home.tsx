@@ -12,7 +12,7 @@ export function HomeContent() {
   const { wallet, status: walletStatus } = useWallet();
   const { status, status: authStatus } = useAuth();
 
-  const walletAddress = wallet?.getAddress();
+  const walletAddress = wallet?.address;
   const isLoggedIn = wallet != null && status === "logged-in";
   const isLoading =
     walletStatus === "in-progress" || authStatus === "initializing";
@@ -66,7 +66,7 @@ export function HomeContent() {
             <div>
               <h2 className="text-lg font-medium">Your wallet</h2>
               <div className="flex items-center gap-2">
-                <p className="text-[15px] text-gray-500 truncate">
+                <p className="text-[15px] text-gray-500">
                   {walletAddress
                     ? `${walletAddress.slice(0, 4)}...${walletAddress.slice(
                         -4

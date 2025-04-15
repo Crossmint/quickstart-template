@@ -1,39 +1,49 @@
 "use client";
 
-import { useState } from "react";
-import { useWallet } from "@crossmint/client-sdk-react-ui";
+import { useEffect, useState } from "react";
+import {
+  type DelegatedSigner,
+  useAuth,
+  useWallet,
+} from "@crossmint/client-sdk-react-ui";
 import { cn } from "@/lib/utils";
 
 export function DelegatedSigner() {
   const { wallet, type } = useWallet();
-  const [status, setStatus] = useState<string>(
-    "Allow other signers to sign transactions on behalf of the wallet."
-  );
-  const [isLoading, setIsLoading] = useState(false);
-  const [delegatedSignerOutput, setDelegatedSignerOutput] = useState<any>(null);
-  const [delegatedSignerInput, setDelegatedSignerInput] = useState<string>("");
+  const { jwt } = useAuth();
 
-  const handleDelegatedDemo = async () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [delegatedSigners, setDelegatedSigners] = useState<DelegatedSigner[]>(
+    []
+  );
+  const [newSigner, setNewSigner] = useState<string>("");
+
+  useEffect(() => {
+    const fetchDelegatedSigners = async () => {
+      if (wallet != null && type === "solana-smart-wallet") {
+        const signers = await wallet.getDelegatedSigners();
+        setDelegatedSigners(signers);
+      }
+    };
+    fetchDelegatedSigners();
+  }, [wallet, jwt]);
+
+  const addNewSigner = async () => {
     if (wallet == null || type !== "solana-smart-wallet") {
       throw new Error("No wallet connected");
     }
-    if (!delegatedSignerInput) {
+    if (!newSigner) {
       alert("Delegated Signer: no signer provided!");
       return;
     }
     try {
       setIsLoading(true);
-      const delegatedSignerData = await wallet.addDelegatedSigner(
-        `solana-keypair:${delegatedSignerInput}`
-      );
-      setStatus("Successfully registered delegated signer!");
-      setDelegatedSignerOutput(delegatedSignerData);
+      await wallet.addDelegatedSigner(`solana-keypair:${newSigner}`);
+      const signers = await wallet.getDelegatedSigners();
+      setDelegatedSigners(signers);
     } catch (err) {
-      const errorMessage =
-        err instanceof Error
-          ? err.message
-          : "Registration failed. Try again or use a different signer address.";
-      alert("Delegated Signer: " + errorMessage);
+      console.error("Delegated Signer: ", err);
+      alert(`Delegated Signer: ${err}`);
     } finally {
       setIsLoading(false);
     }
@@ -42,108 +52,26 @@ export function DelegatedSigner() {
   return (
     <div className="bg-white flex flex-col gap-3 rounded-xl border shadow-sm p-5">
       <div>
-        <h2 className="text-lg font-medium">Delegated Signer</h2>
-        {!isLoading && <p className="text-sm text-gray-500">{status}</p>}
+        <h2 className="text-lg font-medium">Add Delegated Signer</h2>
+        <p className="text-sm text-gray-500">
+          Allow third parties to sign transactions on behalf of your wallet.{" "}
+          <a
+            href="https://docs.crossmint.com/wallets/advanced/delegated-keys"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-accent underline"
+          >
+            Learn more
+          </a>
+          .
+        </p>
       </div>
-      {delegatedSignerOutput && (
-        <div className="mt-4 space-y-3 bg-gray-50 p-4 rounded-md">
-          <h3 className="font-medium text-md">Delegated Signer Details</h3>
-          <div className="grid grid-cols-[120px_1fr] gap-1 text-sm">
-            <div className="font-medium">Type:</div>
-            <div>{delegatedSignerOutput.type}</div>
-            <div className="font-medium">Address:</div>
-            <div className="break-all">
-              {delegatedSignerOutput.locator?.split(":")?.[1] || "N/A"}
-            </div>
-            {delegatedSignerOutput.transaction && (
-              <>
-                <div className="font-medium">Status:</div>
-                <div className="capitalize">
-                  <span
-                    className={`inline-block px-2 py-1 rounded-full text-xs ${
-                      delegatedSignerOutput.transaction.status === "success"
-                        ? "bg-green-100 text-green-800"
-                        : "bg-yellow-100 text-yellow-800"
-                    }`}
-                  >
-                    {delegatedSignerOutput.transaction.status}
-                  </span>
-                </div>
-                <div className="font-medium">Created:</div>
-                <div>
-                  {new Date(
-                    delegatedSignerOutput.transaction.createdAt
-                  ).toLocaleString()}
-                </div>
-                {delegatedSignerOutput.transaction.onChain?.txId && (
-                  <>
-                    <div className="font-medium">Transaction ID:</div>
-                    <div className="break-all">
-                      <a
-                        href={`https://solscan.io/tx/${delegatedSignerOutput.transaction.onChain.txId}?cluster=devnet`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:underline"
-                      >
-                        {delegatedSignerOutput.transaction.onChain.txId.substring(
-                          0,
-                          12
-                        )}
-                        ...
-                      </a>
-                    </div>
-                  </>
-                )}
-              </>
-            )}
-          </div>
-          {delegatedSignerOutput.transaction?.approvals && (
-            <div className="mt-2">
-              <div className="font-medium text-sm mb-1">Approvals:</div>
-              <div className="text-xs bg-gray-100 p-2 rounded overflow-y-auto">
-                <div>
-                  Required:{" "}
-                  {delegatedSignerOutput.transaction.approvals.required}
-                </div>
-                <div>
-                  Submitted:{" "}
-                  {delegatedSignerOutput.transaction.approvals.submitted.length}
-                </div>
-
-                {delegatedSignerOutput.transaction.approvals.submitted.map(
-                  (approval: any, i: number) => (
-                    <div
-                      key={i}
-                      className="mt-1 pl-2 border-l-2 border-gray-300"
-                    >
-                      <div>
-                        Signer:{" "}
-                        {approval.signer.split(":")?.[1] || approval.signer}
-                      </div>
-                      <div>
-                        Time: {new Date(approval.submittedAt).toLocaleString()}
-                      </div>
-                    </div>
-                  )
-                )}
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-      <div className="flex flex-col gap-2">
-        {delegatedSignerOutput == null ? (
-          <>
-            <label className="text-sm font-medium">Delegated Signer</label>
-            <input
-              type="text"
-              className="w-full px-3 py-2 border rounded-md text-sm"
-              placeholder="Ex: 5YNmS1R9nNSCDzb5a7mMJ1dwK9uHeAAF4CmPEwKgVWr8"
-              onChange={(e) => setDelegatedSignerInput(e.target.value)}
-            />
-          </>
-        ) : null}
-      </div>
+      <input
+        type="text"
+        className="w-full px-3 py-2 border rounded-md text-sm"
+        placeholder="Ex: 5YNmS1R9nNSCDzb5a7mMJ1dwK9uHeAAF4CmPEwKgVWr8"
+        onChange={(e) => setNewSigner(e.target.value)}
+      />
       <button
         className={cn(
           "w-full py-2 px-4 rounded-md text-sm font-medium transition-colors",
@@ -151,11 +79,31 @@ export function DelegatedSigner() {
             ? "bg-gray-200 text-gray-500 cursor-not-allowed"
             : "bg-accent text-white hover:bg-accent/80"
         )}
-        onClick={handleDelegatedDemo}
+        onClick={addNewSigner}
         disabled={isLoading}
       >
-        {isLoading ? "Processing..." : "Add Delegated Signer"}
+        {isLoading ? "Processing..." : "Add"}
       </button>
+      {/* List of delegated signers */}
+      {delegatedSigners.length > 0 && (
+        <div className="bg-gray-50 py-2 px-3 rounded-md">
+          <p className="text-xs text-gray-500 mb-1.5">Registered signers</p>
+          {delegatedSigners.length > 0 && (
+            <div className="overflow-x-auto bg-white p-1 rounded border border-gray-100">
+              <ul className="flex flex-col gap-1">
+                {delegatedSigners.map((signer, index) => (
+                  <li
+                    key={index}
+                    className="whitespace-nowrap px-2 py-1 rounded text-xs text-gray-600"
+                  >
+                    {signer.locator}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
